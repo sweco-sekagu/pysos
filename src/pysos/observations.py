@@ -101,12 +101,16 @@ class ObservationManager:
         query: Query,
         file_path: Path | str,
         zip: bool = True,
+        output_fields: list | None = None,
     ) -> None:
         count = self.get_count(query)
         if count == 0:
             raise RuntimeError("No records returned")
         elif count > DOWNLOAD_LIMIT:
             raise RuntimeError("Too many records for export")
+
+        if output_fields:
+            query.update({"output": {"fields": output_fields}})
 
         response = self.session.post(
             self.base_url + "/Exports/Download/Csv",
