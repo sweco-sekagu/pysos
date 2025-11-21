@@ -61,6 +61,8 @@ class ObservationManager:
                             "location.county",
                             "location.municipality",
                             "location.locality",
+                            "location.locationId",
+                            "location.coordinateUncertaintyInMeters",
                             "taxon.vernacularName",
                             "taxon.scientificName",
                             "occurrence.occurrenceId",
