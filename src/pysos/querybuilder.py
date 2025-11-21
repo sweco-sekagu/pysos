@@ -27,6 +27,7 @@ class Query(defaultdict):
         taxons: list[int] = [],
         start_date: date | None = None,
         end_date: date | None = None,
+        geometries: list[dict] = [],
     ) -> None:
         defaultdict.__init__(self, lambda: defaultdict(list))
         self["dataProvider"]["ids"].extend([p.value for p in providers])
@@ -36,6 +37,9 @@ class Query(defaultdict):
 
         for fid in municipalities:
             self.add_area("Municipality", fid)
+
+        if len(geometries) > 0:
+            self.add_geometry_filter(geometries)
 
         if len(taxons) > 0:
             self.add_taxons(taxons)
@@ -51,6 +55,9 @@ class Query(defaultdict):
         self["geographics"]["areas"].append(
             {"areaType": area_type, "featureId": feature_id}
         )
+
+    def add_geometry_filter(self, geometries: list[dict]) -> None:
+        self["geographics"]["geometries"].extend(geometries)
 
     def add_taxons(self, taxon_ids: list[int]) -> None:
         self["taxon"]["ids"].extend(taxon_ids)
