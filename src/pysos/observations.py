@@ -8,6 +8,7 @@ from pysos.querybuilder import AreaType, Query
 OBSERVATION_LIMIT = 10000
 OBSERVATION_TAKE = 1000
 DOWNLOAD_LIMIT = 25000
+ORDER_LIMIT = 2000000
 
 
 class ObservationManager:
@@ -121,3 +122,27 @@ class ObservationManager:
 
         with open(file_path, "wb") as f:
             f.write(response.content)
+
+    def order_csv(
+        self,
+        query: Query,
+        zip: bool = True,
+        output_fields: list | None = None,
+    ) -> str:
+        count = self.get_count(query)
+        if count == 0:
+            raise RuntimeError("No records returned")
+        elif count > ORDER_LIMIT:
+            raise RuntimeError("Too many records for order")
+
+        if output_fields:
+            query.update({"output": {"fields": output_fields}})
+
+        response = self.session.post(
+            self.base_url + "/Exports/Order/Csv",
+            params={"gzip": zip},
+            data=json.dumps(query),
+            headers={"Content-Type": "application/json"},
+        )
+
+        return response.text
